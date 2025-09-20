@@ -44,6 +44,7 @@ namespace SimpleImageOCR.ViewModels
         {
             if (query.TryGetValue("Name", out var nameValue))
                 Name = nameValue?.ToString();
+            if (query.TryGetValue("ExtractedText", out var nameValue))
 
             if (query.TryGetValue("Id", out var idValue) && int.TryParse(idValue?.ToString(), out var parsedId))
                 Id = parsedId;
