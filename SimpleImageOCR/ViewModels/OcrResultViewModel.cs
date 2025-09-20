@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Plugin.Maui.OCR;
 using SimpleImageOCR.Models;
 using SimpleImageOCR.Services;
 using System.Collections.ObjectModel;
-using static Java.Util.Jar.Attributes;
 
 namespace SimpleImageOCR.ViewModels
 {
@@ -42,13 +42,12 @@ namespace SimpleImageOCR.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (query.TryGetValue("Name", out var nameValue))
-                Name = nameValue?.ToString();
             if (query.TryGetValue("ExtractedText", out var nameValue))
+                ExtractedText = nameValue?.ToString();
 
-            if (query.TryGetValue("Id", out var idValue) && int.TryParse(idValue?.ToString(), out var parsedId))
-                Id = parsedId;
-        }
+            if (query.TryGetValue("ImagePath", out nameValue))
+                ImagePath = nameValue?.ToString();
+          }
 
         private void InitializeShareOptions()
         {

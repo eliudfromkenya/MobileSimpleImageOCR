@@ -29,14 +29,17 @@
             </Style>
 
             <Style x:Key="ShareOptionButtonStyle" TargetType="Button">
-                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F8F9FA, Dark=#3C3C3C}" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray700}}" />
                 <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}" />
                 <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="Padding" Value="15,10" />
                 <Setter Property="CornerRadius" Value="10" />
                 <Setter Property="Margin" Value="5" />
-                <Setter Property="BorderWidth" Value="1" />
-                <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                <Setter Property="BorderWidth" Value="2" />
+                <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                <Setter Property="MinimumWidthRequest" Value="120" />
+                <Setter Property="HeightRequest" Value="40" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>

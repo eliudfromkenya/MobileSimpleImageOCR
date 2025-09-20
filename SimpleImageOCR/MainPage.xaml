@@ -24,7 +24,7 @@
                    Padding="25"
                    Margin="0,0,0,10">
                 <StackLayout Spacing="12">
-                    <Label Text="📸 Simple OCR" 
+                    <Label Text="📸 Eliud's OCR" 
                            FontSize="32" 
                            FontAttributes="Bold"
                            TextColor="White"
