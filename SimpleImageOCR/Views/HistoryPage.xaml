@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="SimpleImageOCR.Views.HistoryPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:viewmodels="clr-namespace:SimpleImageOCR.ViewModels"
+             xmlns:models="clr-namespace:SimpleImageOCR.Models"
+             x:DataType="viewmodels:HistoryViewModel"
+             Title="OCR History"
+             Style="{StaticResource ContentPageStyle}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsEqualConverter x:Key="IsEqualConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Frame Grid.Row="0" Style="{StaticResource CardFrameStyle}">
+            <Grid Padding="20,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackLayout Grid.Column="0">
+                    <Label Text="📚 OCR History" 
+                           Style="{StaticResource PageTitleStyle}"
+                           HorizontalOptions="Start" />
+                    <Label Text="{Binding StatusMessage}" 
+                           Style="{StaticResource CaptionTextStyle}"
+                           IsVisible="{Binding StatusMessage, Converter={toolkit:IsStringNotNullOrEmptyConverter}}" />
+                </StackLayout>
+
+                <StackLayout Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <Button Text="🔄" 
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                            FontSize="18"
+                            Command="{Binding RefreshCommand}"
+                            IsEnabled="{Binding IsLoading, Converter={toolkit:InvertedBoolConverter}}" />
+                    
+                    <ActivityIndicator Style="{StaticResource LoadingIndicatorStyle}"
+                                     IsRunning="{Binding IsLoading}"
+                                     IsVisible="{Binding IsLoading}" />
+                </StackLayout>
+            </Grid>
+        </Frame>
+
+        <!-- Search and Actions -->
+        <Frame Grid.Row="1" Style="{StaticResource CardFrameStyle}" Margin="20,5">
+            <StackLayout Padding="20,15" Spacing="15">
+                <!-- Search Bar -->
+                <SearchBar x:Name="SearchBar"
+                          Text="{Binding SearchText}"
+                          Placeholder="🔍 Search OCR results..."
+                          BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray700}}"
+                          TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                          PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+
+                <!-- Action Buttons -->
+                <Grid IsVisible="{Binding HasResults}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Text="{Binding IsSelectionMode, Converter={toolkit:BoolToObjectConverter}, ConverterParameter='✅ Done|📋 Select'}"
+                            Style="{StaticResource CardButtonStyle}"
+                            Command="{Binding ToggleSelectionModeCommand}" />
+
+                    <Button Grid.Column="1"
+                            Text="📤 Share All"
+                            Style="{StaticResource CardButtonStyle}"
+                            Command="{Binding ShareSelectedCommand}"
+                            IsVisible="{Binding IsSelectionMode}"
+                            IsEnabled="{Binding SelectedResults.Count, Converter={toolkit:CompareConverter}, ConverterParameter=0}" />
+
+                    <Button Grid.Column="2"
+                            Text="🗑️ Clear All"
+                            Style="{StaticResource CardButtonStyle}"
+                            Command="{Binding ClearAllCommand}"
+                            IsVisible="{Binding IsSelectionMode, Converter={toolkit:InvertedBoolConverter}}" />
+
+                    <Button Grid.Column="2"
+                            Text="🗑️ Delete"
+                            Style="{StaticResource CardButtonStyle}"
+                            Command="{Binding DeleteSelectedCommand}"
+                            IsVisible="{Binding IsSelectionMode}"
+                            IsEnabled="{Binding SelectedResults.Count, Converter={toolkit:CompareConverter}, ConverterParameter=0}" />
+                </Grid>
+            </StackLayout>
+        </Frame>
+
+        <!-- Results List -->
+        <ScrollView Grid.Row="2" IsVisible="{Binding HasResults}" Style="{StaticResource ScrollViewStyle}">
+            <CollectionView ItemsSource="{Binding FilteredResults}"
+                            SelectionMode="None"
+                            VerticalOptions="FillAndExpand">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:OcrResult">
+                        <Frame Style="{StaticResource CardFrameStyle}">
+                            <Grid Padding="15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Selection Checkbox -->
+                                <CheckBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                                         IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=IsSelectionMode}"
+                                         IsChecked="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=SelectedResults, Converter={toolkit:IsEqualConverter}, ConverterParameter={x:Reference .}}"
+                                         Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                         VerticalOptions="Center"
+                                         Margin="0,0,10,0">
+                                    <CheckBox.Behaviors>
+                                        <toolkit:EventToCommandBehavior EventName="CheckedChanged"
+                                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=ToggleResultSelectionCommand}"
+                                                                       CommandParameter="{Binding .}" />
+                                    </CheckBox.Behaviors>
+                                </CheckBox>
+
+                                <!-- Date and Time -->
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding FormattedDate}"
+                                       Style="{StaticResource CaptionTextStyle}"
+                                       FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+
+                                <!-- Preview Text -->
+                                <Label Grid.Row="1" Grid.Column="1"
+                                       Text="{Binding PreviewText}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="3"
+                                       Margin="0,5,0,10" />
+
+                                <!-- Action Buttons -->
+                                <StackLayout Grid.Row="2" Grid.Column="1" 
+                                           Orientation="Horizontal" 
+                                           Spacing="10"
+                                           IsVisible="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=IsSelectionMode, Converter={toolkit:InvertedBoolConverter}}">
+                                    <Button Text="👁️ View"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=ViewResultCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    
+                                    <Button Text="📤 Share"
+                                            Style="{StaticResource CardButtonStyle}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=ShareResultCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    
+                                    <Button Text="🗑️"
+                                            Style="{StaticResource CardButtonStyle}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=DeleteResultCommand}"
+                                            CommandParameter="{Binding .}" />
+                                </StackLayout>
+
+                                <!-- Tap Gesture for Selection Mode -->
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=ViewResultCommand}"
+                                                         CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+
+        <!-- Empty State -->
+        <StackLayout Grid.Row="2" 
+                     IsVisible="{Binding HasResults, Converter={toolkit:InvertedBoolConverter}}"
+                     VerticalOptions="CenterAndExpand"
+                     HorizontalOptions="CenterAndExpand"
+                     Spacing="20">
+            <Label Text="📭"
+                   FontSize="64"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray400}, Dark={StaticResource Gray600}}" />
+            
+            <Label Text="No OCR results yet"
+                   Style="{StaticResource SectionHeaderStyle}"
+                   HorizontalOptions="Center" />
+            
+            <Label Text="Start by taking a photo or selecting an image to extract text"
+                   Style="{StaticResource BodyTextStyle}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Margin="40,0" />
+            
+            <Button Text="📷 Start Scanning"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding NewScanCommand}"
+                    HorizontalOptions="Center"
+                    Margin="0,20,0,0" />
+        </StackLayout>
+
+        <!-- Bottom Actions -->
+        <Frame Grid.Row="3" 
+               Style="{StaticResource CardFrameStyle}" 
+               Margin="20,5,20,10"
+               IsVisible="{Binding HasResults}">
+            <Grid Padding="20,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Text="📷 New Scan"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding NewScanCommand}" />
+
+                <Label Grid.Column="1"
+                       Text="{Binding TotalResults, StringFormat='{0} results total'}"
+                       Style="{StaticResource CaptionTextStyle}"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End" />
+            </Grid>
+        </Frame>
+
+        <!-- Loading Overlay -->
+        <Grid Grid.RowSpan="4" 
+              BackgroundColor="#80000000" 
+              IsVisible="{Binding IsLoading}">
+            <Frame BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                   CornerRadius="15"
+                   Padding="30"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center">
+                <StackLayout Orientation="Horizontal" Spacing="15">
+                    <ActivityIndicator IsRunning="True" 
+                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                    <Label Text="Loading..." 
+                           FontSize="16"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}" />
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>
