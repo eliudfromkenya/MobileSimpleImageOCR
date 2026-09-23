@@ -17,7 +17,7 @@
             </Grid.RowDefinitions>
 
             <!-- Header Section -->
-            <Frame Grid.Row="0" 
+            <Border Grid.Row="0" 
                    BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                    CornerRadius="20"
                    HasShadow="True"
@@ -35,10 +35,10 @@
                            HorizontalOptions="Center"
                            Opacity="0.9" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Status Section -->
-            <Frame Grid.Row="1" 
+            <Border Grid.Row="1" 
                    BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
                    CornerRadius="15"
                    HasShadow="True"
@@ -56,7 +56,7 @@
                            VerticalOptions="Center"
                            FlexLayout.Grow="1" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Action Cards Section -->
             <Grid Grid.Row="2" ColumnSpacing="20" RowSpacing="20" Margin="0,10">
@@ -70,7 +70,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Take Photo Card -->
-                <Frame Grid.Row="0" Grid.Column="0"
+                <Border Grid.Row="0" Grid.Column="0"
                        BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
                        CornerRadius="20"
                        HasShadow="True"
@@ -93,7 +93,7 @@ Take Photo]]>
                             </Trigger>
                         </Button.Triggers>
                     </Button>
-                </Frame>
+                </Border>
 
                 <!-- Pick Photo Card -->
                 <Frame Grid.Row="0" Grid.Column="1"
